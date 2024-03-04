@@ -63,6 +63,20 @@ async function run() {
         const result = await userCollection.find().toArray();
         res.send(result);
     })
+    app.get('/users/admin/:email', verifytoken, async (req, res) =>{
+      const email = req.params.email;
+      if(email !==req.decoded.email){
+        return res.status(403).send({ message : 'unauthorized access'})
+      }
+      const query = {email : email};
+      const user = await userCollection.findOne(query);
+      let admin = false;
+      if(user){
+        admin = user?.role === 'admin';
+      }
+      res.send({admin});
+      
+    })
     app.delete('/users/:id', async (req, res) =>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
@@ -80,6 +94,7 @@ async function run() {
       const result = await userCollection.updateOne(filter, updatedDoc);
       res.send(result);
     })
+    
     app.post('/users', async (req, res) =>{
         const user = req.body;
         const result = await userCollection.insertOne(user);
