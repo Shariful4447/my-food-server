@@ -194,6 +194,11 @@ async function run() {
       })
 
     })
+
+    // payment releated api
+    app.post('payments', async(req, res)=>{
+      
+    })
     
 
     // Send a ping to confirm a successful connection
