@@ -223,6 +223,21 @@ async function run() {
 
       res.send({ paymentResult, deleteResult });
     })
+
+    app.get('/admin-stats', async (req, res) => {
+      const users = await userCollection.estimatedDocumentCount();
+      const menuItems = await menuCollection.estimatedDocumentCount();
+      const orders = await paymentCollection.estimatedDocumentCount();
+      // revenue calculation but not proper way
+      const payments = await paymentCollection.find().toArray();
+      const revenue = payments.reduce((total, payment) => total+payment.price,0)
+      res.send({
+         users ,
+         menuItems,
+         orders,
+         revenue
+        });
+    })
     
 
     // Send a ping to confirm a successful connection
