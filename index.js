@@ -229,8 +229,20 @@ async function run() {
       const menuItems = await menuCollection.estimatedDocumentCount();
       const orders = await paymentCollection.estimatedDocumentCount();
       // revenue calculation but not proper way
-      const payments = await paymentCollection.find().toArray();
-      const revenue = payments.reduce((total, payment) => total+payment.price,0)
+      //const payments = await paymentCollection.find().toArray();
+    //const revenue = payments.reduce((total, payment) => total+payment.price,0)
+    // proper way to calculate revenue
+    const result = await paymentCollection.aggregate([
+      {
+        $group:{
+          _id:null,
+          totalRevenue:{
+            $sum:'$price'
+          }
+        }
+      }
+    ]).toArray();
+    const revenue = result.length > 0 ? result[0].totalRevenue :0;
       res.send({
          users ,
          menuItems,
