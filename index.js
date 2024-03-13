@@ -254,7 +254,42 @@ async function run() {
       })
     })
 
-    
+    //order status
+    /**
+     * ----------------
+     * non efficient way
+     * load all the payments
+     * for every menuITEMS(which is an array) find from menu collection
+     * for every item in the menu 
+     */
+    //using aggregate pipeline
+  app.get('/order-stats', async(req, res)=>{
+    const result = await paymentCollection.aggregate([
+      {
+        $unwind: '$menuItemId'
+      },
+      {
+        $lookup: {
+          from: 'menu',
+          localField: 'menuItemId',
+          foreignField: '_id',
+          as: 'menuItems'
+        }
+      },
+      {
+        $unwind: '$menuItems'
+      },
+      {
+        $group: {
+          _id: '$menuItems.category',
+          quantity: {$sum: 1},
+          revenue:{$sum:'$menuItems.price'}
+        }
+      }
+    ]).toArray();
+    res.send(result);
+  })
+      
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
