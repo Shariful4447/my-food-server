@@ -167,6 +167,15 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/bookings/:email', verifytoken, async (req, res) => {
+      const query = { email: req.params.email }
+      if (req.params.email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const result = await bookingsCollection.find(query).toArray();
+      res.send(result);
+  })
+
     //cart collection
     app.get('/carts', async(req, res)=>{
         const email = req.query.email;
