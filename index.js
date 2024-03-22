@@ -5,7 +5,12 @@ const port = process.env.PORT || 8000;
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
+// const formData = require('form-data');
+// const Mailgun = require("mailgun.js");
+// const mailgun = new Mailgun(formData);
+// const mg = mailgun({
+//   apiKey: process.env.MAILGUN_API_KEY, 
+//   domain: process.env.MAILGUN_SENDING_API});
 
 
 // middleware
@@ -161,6 +166,10 @@ async function run() {
         res.send(result);
     })
     //bookings
+    app.get('/bookings', async (req, res) => {
+      const result = await bookingsCollection.find().toArray();
+      res.send(result);
+  })
     app.post('/bookings',verifytoken, async (req, res) =>{
       const bookings = req.body;
       const result = await bookingsCollection.insertOne(bookings);
@@ -236,7 +245,23 @@ async function run() {
       };
 
       const deleteResult = await cartCollection.deleteMany(query);
+      // send user email notification payment
+      // const data = {
+      //   from: "Mailgun Sandbox <postmaster@sandbox578cd5d84d8c43f28a94e53eed0100f9.mailgun.org>",
+      //   to: "roslinshuvo@gmail.com",
+      //   subject: " Order confirmation",
+      //   text: "Testing some Mailgun awesomness!",
+      //   html: 
+      //   `
+      //   <h2>Thank you for your order with us.</h2>
+      //   <h4>Transaction Id : <strong>${payment.transactionId}</strong></h4>
+      //   <p>we would be pleased if you submit a rating testing the food </p>
 
+      //   `
+      // };
+      // mg.messages().send(data, function (error, body) {
+      //   console.log(body);
+      // });
       res.send({ paymentResult, deleteResult });
     })
 
