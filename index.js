@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 8000;
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -12,7 +11,15 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 //   apiKey: process.env.MAILGUN_API_KEY, 
 //   domain: process.env.MAILGUN_SENDING_API});
 
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: 'api', 
+  key: process.env.MAILGUN_API_KEY
+});
 
+const port = process.env.PORT || 8000;
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -262,6 +269,22 @@ async function run() {
       // mg.messages().send(data, function (error, body) {
       //   console.log(body);
       // });
+      mg.messages.create(process.env.MAILGUN_SENDING_API, {
+        from: "Mailgun Sandbox <postmaster@sandbox578cd5d84d8c43f28a94e53eed0100f9.mailgun.org>",
+        to: ["roslinshuvo@gmail.com"],
+        subject: "Order Confirmation",
+        text: "Testing some Mailgun awesomeness!",
+        html: 
+          `
+          <h2>Thank you for your order with us.</h2>
+          <h4>Transaction Id : <strong>${payment.transactionId}</strong></h4>
+          <p>we would be pleased if you submit a rating testing the food </p>
+  
+          `
+
+      })
+      .then(msg => console.log(msg)) // logs response data
+      .catch(err => console.log(err)); // logs any error
       res.send({ paymentResult, deleteResult });
     })
 
