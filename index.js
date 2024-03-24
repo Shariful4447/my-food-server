@@ -15,9 +15,10 @@ const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
-  username: 'api', 
-  key: process.env.MAILGUN_API_KEY
+  username: 'api',
+  key: process.env.MAIL_GUN_API_KEY,
 });
+
 
 const port = process.env.PORT || 8000;
 // middleware
@@ -269,22 +270,40 @@ async function run() {
       // mg.messages().send(data, function (error, body) {
       //   console.log(body);
       // });
-      mg.messages.create(process.env.MAILGUN_SENDING_API, {
-        from: "Mailgun Sandbox <postmaster@sandbox578cd5d84d8c43f28a94e53eed0100f9.mailgun.org>",
-        to: ["roslinshuvo@gmail.com"],
-        subject: "Order Confirmation",
-        text: "Testing some Mailgun awesomeness!",
-        html: 
-          `
-          <h2>Thank you for your order with us.</h2>
-          <h4>Transaction Id : <strong>${payment.transactionId}</strong></h4>
-          <p>we would be pleased if you submit a rating testing the food </p>
+      // mg.messages.create(process.env.MAILGUN_SENDING_API, {
+      //   from: "Mailgun Sandbox <postmaster@sandbox578cd5d84d8c43f28a94e53eed0100f9.mailgun.org>",
+      //   to: ["roslinshuvo@gmail.com"],
+      //   subject: "Order Confirmation",
+      //   text: "Testing some Mailgun awesomeness!",
+      //   html: 
+      //     `
+      //     <h2>Thank you for your order with us.</h2>
+      //     <h4>Transaction Id : <strong>${payment.transactionId}</strong></h4>
+      //     <p>we would be pleased if you submit a rating testing the food </p>
   
-          `
+      //     `
 
-      })
-      .then(msg => console.log(msg)) // logs response data
-      .catch(err => console.log(err)); // logs any error
+      // })
+      // .then(msg => console.log(msg)) // logs response data
+      // .catch(err => console.log(err)); // logs any error
+
+      mg.messages
+        .create(process.env.MAIL_SENDING_DOMAIN, {
+          from: "Mailgun Sandbox <postmaster@sandbox578cd5d84d8c43f28a94e53eed0100f9.mailgun.org>",
+          to: ["roslinshuvo@gmail.com"],
+          subject: "Bistro Boss Order Confirmation",
+          text: "Testing some Mailgun awesomness!",
+          html: `
+            <div>
+              <h2>Thank you for your order</h2>
+              <h4>Your Transaction Id: <strong>${payment.transactionId}</strong></h4>
+              <p>We would like to get your feedback about the food</p>
+            </div>
+          `
+        })
+        .then(msg => console.log(msg)) // logs response data
+        .catch(err => console.log(err)); // logs any error`;
+
       res.send({ paymentResult, deleteResult });
     })
 
