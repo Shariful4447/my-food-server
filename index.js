@@ -168,10 +168,15 @@ async function run() {
       const result = await menuCollection.updateOne(filter, updatedDoc)
       res.send(result);
     })
-
+    // Reviews
     app.get('/reviews', async (req, res) => {
         const result = await reviewCollection.find().toArray();
         res.send(result);
+    })
+    app.post('/reviews', verifytoken, async (req, res) =>{
+      const item = req.body;
+      const result = await reviewCollection.insertOne(item);
+      res.send(result)
     })
     //bookings
     app.get('/bookings', async (req, res) => {
@@ -212,6 +217,8 @@ async function run() {
         res.send(result);
 
     })
+    
+    
 
     // payment
     app.post('/create-payment-intent', async(req, res)=>{
